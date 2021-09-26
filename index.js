@@ -111,6 +111,28 @@ const types = {};
  * @property {number} apprSpeedRef
  * @property {number} maxPassengers
  */
+/**
+ * An Airline
+ * @memberof types
+ * @typedef {Object} airline
+ * @prop {number} id
+ * @prop {string} name
+ * @prop {string} code
+ * @prop {boolean} isGold 
+ * @prop {boolean} isManager
+ * @prop {string} callsignFormat
+ */
+/**
+ * An Airlines Page
+ * @memberof types
+ * @typedef {Object} airlinePage
+ * @property {number} pageIndex
+ * @property {number} totalPages
+ * @property {number} totalCount
+ * @property {boolean} hasPreviousPage
+ * @property {boolean} hasNextPage
+ * @property {Array<airline>} data
+ */
 
 //Dependancies
 const req = require('req-fast');
@@ -474,6 +496,90 @@ aircraft.getLivery = function (id) {
     })
 }
 
+//Airlines
+/**
+ * @namespace
+ */
+const airlines = {};
+/**
+ * Get Airlines
+ * @param {number} page Page Number
+ * @returns {Promise<airlinePage>}
+ */
+airlines.getAirlines = function (page) {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/public/v1/airlines?page=${page.toString()}`,
+            method: "GET",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+/**
+ * Get Airline
+ * @param {number} id Airline ID
+ * @returns {Promise<airline>}
+ */
+airlines.getAirline = function (id) {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/public/v1/airlines/${id.toString()}`,
+            method: "GET",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+/**
+ * Update Airline
+ * @param {number} id Airline ID
+ * @param {string} name Name of the Airline
+ * @param {string} code 3-4 Letter Code of Airline
+ * @param {string} callsignFormat
+ * @returns {Promise<airline>}
+ */
+airlines.updateAirline = function (id, name, code, callsignFormat) {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/public/v1/airlines/${id.toString()}`,
+            method: "PUT",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            data: {
+                name: name,
+                code: code,
+                callsignFormat: callsignFormat
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+
+
 //Exports
 exports.init = main.init;
 exports.core = main;
@@ -482,3 +588,4 @@ exports.atc = atc;
 exports.codeshare = codeshare;
 exports.airport = airport;
 exports.aircraft = aircraft;
+exports.airlines = airlines;
