@@ -134,6 +134,45 @@ const types = {};
  * @property {Array<airline>} data
  */
 
+/** 
+ * A Slot
+ * @memberof types
+ * @typedef {Object} Slot
+ * @prop {string} id
+ * @prop {string} gate
+ * @prop {string} pilotId
+ * @prop {string} pilotName
+ */
+
+/**
+ * An event
+ * @memberof types
+ * @typedef {Object} event
+ * @prop {string} id
+ * @prop {string} name
+ * @prop {string} description
+ * @prop {string} dateTime
+ * @prop {string} departureIcao
+ * @prop {string} arrivalIcao
+ * @prop {string} aircraftLiveryId
+ * @prop {string} aircraftName
+ * @prop {string} server
+ * @prop {number} airlineId
+ * @prop {string} airlineName
+ * @prop {Array<Slot>} slots
+ */
+/**
+ * An Events Page
+ * @memberof types
+ * @typedef {Object} eventPage
+ * @property {number} pageIndex
+ * @property {number} totalPages
+ * @property {number} totalCount
+ * @property {boolean} hasPreviousPage
+ * @property {boolean} hasNextPage
+ * @property {Array<event>} data
+ */
+
 //Dependancies
 const req = require('req-fast');
 
@@ -579,6 +618,104 @@ airlines.updateAirline = function (id, name, code, callsignFormat) {
     })
 }
 
+//Events
+/**
+ * @namespace
+ */
+const events = {};
+/**
+ * Get Events
+ * @param {number} page 
+ * @returns {Promise<Array<eventPage>>}
+ */
+events.getEvents = function (page) {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/public/v1/events?page=${page.toString()}`,
+            method: "GET",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+/**
+ * Get Event
+ * @param {number} id Event ID
+ * @returns {Promise<event>}
+ */
+events.getEvent = function (id) {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/public/v1/events/${id.toString()}`,
+            method: "GET",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+/**
+ * Get Event Slots
+ * @param {number} id Event ID
+ * @returns {Promise<Array<Slot>>}
+ */
+events.getEventSlots = function (id) {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/public/v1/events/${id.toString()}/slots`,
+            method: "GET",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+/**
+ * Get Event Slot
+ * @param {number} eid Event ID
+ * @param {number} sid Slot ID
+ * @returns {Promise<Slot>}
+ */
+events.getEventSlot = function (eid, sid) {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/public/v1/events/${eid.toString()}/slots/${sid.toString()}`,
+            method: "GET",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
 
 //Exports
 exports.init = main.init;
@@ -589,3 +726,4 @@ exports.codeshare = codeshare;
 exports.airport = airport;
 exports.aircraft = aircraft;
 exports.airlines = airlines;
+exports.events = events;
