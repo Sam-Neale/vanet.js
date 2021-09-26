@@ -95,6 +95,22 @@ const types = {};
  * @property {?Array<airportFrequency>} frequencies
  * @property {?Array<airportRunway>} runways
  */
+/**
+ * An Aircraft object
+ * @memberof types
+ * @typedef {Object} Aircraft
+ * @property {string} liveryID
+ * @property {string} aircraftID
+ * @property {string} aircraftName
+ * @property {string} liveryName
+ * @property {number} maxTakeoffWeight
+ * @property {number} maxLandingWeight
+ * @property {string} neverExceed
+ * @property {number} serviceCeiling
+ * @property {number} range
+ * @property {number} apprSpeedRef
+ * @property {number} maxPassengers
+ */
 
 //Dependancies
 const req = require('req-fast');
@@ -384,6 +400,80 @@ airport.getAtis = function (icao) {
     })
 }
 
+//Aircaft
+/**
+ * @namespace
+ */
+const aircraft = {};
+/**
+ * Get All Aircraft
+ * @returns {Promise<Aircraft>}
+ */
+aircraft.getAllAircraft = function () {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/public/v1/aircraft`,
+            method: "GET",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+/**
+ * Get Aircraft Liveries
+ * @param {string} id 
+ * @returns {Promise<Array<Aircraft>>}
+ */
+aircraft.getAircraftLivs = function (id) {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/public/v1/aircraft/${id}`,
+            method: "GET",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+/**
+ * Get Aircraft Livery
+ * @param {string} id 
+ * @returns {Promise<Aircraft>}
+ */
+aircraft.getLivery = function (id) {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/public/v1/aircraft/livery/${id}`,
+            method: "GET",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+
 //Exports
 exports.init = main.init;
 exports.core = main;
@@ -391,3 +481,4 @@ exports.acars = acars;
 exports.atc = atc;
 exports.codeshare = codeshare;
 exports.airport = airport;
+exports.aircraft = aircraft;
