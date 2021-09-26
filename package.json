@@ -1,0 +1,25 @@
+{
+  "name": "vanet.js",
+  "version": "1.0.0",
+  "description": "A nodejs module to interact with VANet",
+  "main": "index.js",
+  "scripts": {
+    "docs": "jsdoc index.js -t node_modules/clean-jsdoc-theme",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "VANet",
+    "Node",
+    "NPM"
+  ],
+  "author": "Sam Neale <sam@va-center.com>",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "clean-jsdoc-theme": "^3.2.8",
+    "req-fast": "^0.2.21"
+  },
+  "devDependencies": {
+    "dotenv": "^10.0.0"
+  }
+}
