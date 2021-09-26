@@ -15,15 +15,33 @@
  * @typedef {Object} ATC
  * @property {string} frequencyId ID of the frequency
  * @property {string} userId ID of the controller
- * @property {string|null} username Username of the controller
- * @property {string|null} virtualOrganization VA/VO of the controller
- * @property {string|null} airportName Name of the airport for the frequency
+ * @property {?string} username Username of the controller
+ * @property {?string} virtualOrganization VA/VO of the controller
+ * @property {?string} airportName Name of the airport for the frequency
  * @property {0|1|2|3|4|5|6|7|8|9|10|11} type Type of the frequency
  * @property {number} latitude Latitude of the airport
  * @property {number} longitude Longitude of the airport
  * @property {string} startTime Date string of frequency opening time.
  */
-
+/**
+ * A route object
+ * @typedef {Object} Route
+ * @property {string} id Route ID
+ * @property {?string} flightNumber Route Flight Number
+ * @property {?string} departureIcao Route Departure ICAO
+ * @property {?string} arrivalIcao Route Arrival ICAO
+ * @property {number} flightTime Route Flight time in seconds.
+ * @property {?string} aircraftLiveryId Route Aircraft Livery ID
+ */
+/**
+ * A codeshare object
+ * @typedef {Object} Codeshare
+ * @property {string} id Codeshare ID
+ * @property {?string} senderName Sender Airline Name
+ * @property {?string} recipientName Recipient Airline Name
+ * @property {?string} message Optional Message
+ * @property {Array<Route>} routes Array of codeshare routes
+ */
 
 
 //Dependancies
@@ -140,8 +158,111 @@ atc.getActiveATC = function(server){
     })
 }
 
+//Codeshare
+const codeshare = {};
+
+/**
+ * Gets all codeshare requests.
+ * @returns {Promise<Array<Codeshare>>} Array of codeshare requests.
+ */
+codeshare.getAll = function(){
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/airline/v1/codeshares`,
+            method: "GET",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+/**
+ * Create Codeshare request.
+ * @param {string} recipID Recipient Airline ID
+ * @param {string} message Optional Message
+ * @param {Array<Route>} routes The routes to send
+ * @return {Promise<boolean>} True for success
+ */
+codeshare.create = function(recipID, message, routes){
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/airline/v1/codeshares`,
+            method: "POST",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            data:{
+                recipientID: recipID,
+                message: message,
+                routes: routes
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(true);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+/**
+ * Get Codeshare request.
+ * @param {string} id ID of codeshare
+ * @returns {Promise<Codeshare>} Codeshare Request
+ */
+codeshare.get = function (id) {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/airline/v1/codeshares/${id}`,
+            method: "GET",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(res.body.result);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+/**
+ * Delete Codeshare request.
+ * @param {string} id ID of codeshare
+ * @returns {Promise<boolean>} True if success
+ */
+codeshare.delete = function (id) {
+    return new Promise((resolve, reject) => {
+        req({
+            url: `https://api.vanet.app/airline/v1/codeshares/${id}`,
+            method: "DELETE",
+            headers: {
+                'X-Api-Key': main.id
+            },
+            dataType: "json"
+        }, function (err, res) {
+            if (res.statusCode == 200) {
+                resolve(true);
+            } else {
+                reject(`Response: ${res.statusCode}, ${err ? err : "Unknown Error"}`)
+            }
+        })
+    })
+}
+
 //Exports
 exports.init = main.init;
 exports.core = main;
 exports.acars = acars;
 exports.atc = atc;
+exports.codeshare = codeshare;
